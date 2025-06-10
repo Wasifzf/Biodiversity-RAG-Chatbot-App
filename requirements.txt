@@ -1,0 +1,10 @@
+pinecone
+sentence-transformers
+pymupdf
+langchain
+langchain-community
+langdetect
+torch
+groq
+scikit-learn
+streamlit
