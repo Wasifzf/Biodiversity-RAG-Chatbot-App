@@ -5,30 +5,25 @@ from sentence_transformers import SentenceTransformer
 import torch
 import streamlit as st
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+def get_models():
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    return {
+        "labse": SentenceTransformer("sentence-transformers/LaBSE", device=device),
+        "bge-m3": SentenceTransformer("BAAI/bge-m3", device=device),
+        "distiluse": SentenceTransformer("distiluse-base-multilingual-cased-v2", device=device),
+    }
 
-models = {
-    "labse": SentenceTransformer("sentence-transformers/LaBSE", device=device),
-    "bge-m3": SentenceTransformer("BAAI/bge-m3", device=device),
-    "distiluse": SentenceTransformer("distiluse-base-multilingual-cased-v2", device=device),
-}
+def get_pinecone_indexes():
+    PINECONE_API_KEY = st.secrets.get("PINECONE_API_KEY", "")
+    PINECONE_ENV = "us-east-1"
+    pinecone_client = Pinecone(api_key=PINECONE_API_KEY, environment=PINECONE_ENV)
 
-PINECONE_API_KEY = st.secrets["PINECONE_API_KEY"]
-PINECONE_ENV = "us-east-1"
-labse_name = "index1"
-bge_name = "bge-m3"
-distiluse_name = "distiluse"
+    return {
+        "labse": pinecone_client.Index(name="index1"),
+        "bge-m3": pinecone_client.Index(name="bge-m3"),
+        "distiluse": pinecone_client.Index(name="distiluse"),
+    }
 
-pinecone_client = Pinecone(api_key=PINECONE_API_KEY, environment=PINECONE_ENV)
-
-index_labse = pinecone_client.Index(name=labse_name)
-index_bge = pinecone_client.Index(name=bge_name)
-index_distiluse = pinecone_client.Index(name=distiluse_name)
-
-os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
-
-
-GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
-client = Groq(api_key=GROQ_API_KEY)
-
-
+def get_groq_client():
+    GROQ_API_KEY = st.secrets.get("GROQ_API_KEY", "")
+    return Groq(api_key=GROQ_API_KEY)
