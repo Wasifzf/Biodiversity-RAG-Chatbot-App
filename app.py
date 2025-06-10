@@ -1,15 +1,22 @@
 import streamlit as st
-from api import models, index_labse, index_bge, index_distiluse, client
+st.set_page_config(page_title="AI for Conservation Q&A", layout="wide")
+from api import get_models, get_pinecone_indexes, get_groq_client
 from langdetect import detect
+
+# --- Lazy loading of models and clients ---
+@st.cache_resource
+def load_resources():
+    models = get_models()
+    indexes = get_pinecone_indexes()
+    client = get_groq_client()
+    return models, indexes, client
+
+models, indexes, client = load_resources()
 
 # --- Utility functions ---
 
 def get_index(model_name):
-    return {
-        "labse": index_labse,
-        "bge-m3": index_bge,
-        "distiluse": index_distiluse
-    }.get(model_name)
+    return indexes.get(model_name)
 
 def search_pinecone(query, model_name, chunking_type=None, top_k=10):
     model = models[model_name]
@@ -34,7 +41,6 @@ def search_pinecone(query, model_name, chunking_type=None, top_k=10):
     )
     return results
 
-
 def generate_answer_groq(matches, query):
     context = "\n\n".join([match['metadata']['text'] for match in matches])
 
@@ -56,10 +62,8 @@ def generate_answer_groq(matches, query):
 
     return response.choices[0].message.content
 
+# --- Streamlit App UI ---
 
-# --- Streamlit App ---
-
-st.set_page_config(page_title="AI for Conservation Q&A", layout="wide")
 st.title("🌿 AI for Biodiversity & Conservation")
 st.write("Ask a question related to **biodiversity**, **climate change**, or **AI in conservation**.")
 
@@ -85,7 +89,7 @@ if st.button("💬 Get Answer"):
                     st.subheader("💡 Answer")
                     st.markdown(answer, unsafe_allow_html=True)
 
-                    # Optional: Show source texts if user wants
+                    # Optional: Show source texts
                     with st.expander("📚 Show Retrieved Context"):
                         for i, match in enumerate(matches):
                             st.markdown(f"**Source {i+1}:** {match['metadata'].get('source', 'N/A')}")
