@@ -67,7 +67,7 @@ query = st.text_area("🔍 Enter your question:", height=100)
 
 model_name = st.selectbox("🧠 Choose an embedding model:", ["bge-m3", "labse", "distiluse"])
 chunking_type = st.selectbox("📦 Select chunking method:", [None, "token", "char", "sentence", "semantic"])
-top_k = st.slider("📈 Top K matches to retrieve:", min_value=1, max_value=20, value=10)
+top_k = st.slider("📈 Top K matches to retrieve:", min_value=1, max_value=10, value=10)
 
 if st.button("💬 Get Answer"):
     if query.strip() == "":
