@@ -3,6 +3,7 @@ from groq import Groq
 import os
 from sentence_transformers import SentenceTransformer
 import torch
+import streamlit as st
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -12,7 +13,7 @@ models = {
     "distiluse": SentenceTransformer("distiluse-base-multilingual-cased-v2", device=device),
 }
 
-PINECONE_API_KEY = "pcsk_3B7xYL_n353PLw3NEZ7KxFncYou4UTHMiMjh7XXGCJZCPVdcW4tcbPWs76jbyqLMrW65L"
+PINECONE_API_KEY = st.secrets["PINECONE_API_KEY"]
 PINECONE_ENV = "us-east-1"
 labse_name = "index1"
 bge_name = "bge-m3"
@@ -27,7 +28,7 @@ index_distiluse = pinecone_client.Index(name=distiluse_name)
 os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
 
 
-GROQ_API_KEY = "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"
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 client = Groq(api_key=GROQ_API_KEY)
 
 
