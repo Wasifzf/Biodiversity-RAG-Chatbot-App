@@ -72,7 +72,8 @@ streamlit run app.py
 
 ```bash
 python query.py
-
+```
+```bash
 # Code Block
 query = "How is AI used in conservation to support biodiversity and protect endangered species?"
 
